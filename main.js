@@ -1,18 +1,24 @@
 (function () {
 
-	var fs = require("fs"),
-		Q = require("q"),
-		rimraf = require("rimraf"),
-		mkdirp = require("mkdirp"),
-		parameterize = require("parameterize"),
-		limit = require("simple-rate-limiter"),
-		tmpName = Q.denodeify(require("tmp").tmpName);
+	var fs = require('fs'),
+		Q = require('q'),
+		rimraf = require('rimraf'),
+		mkdirp = require('mkdirp'),
+		parameterize = require('parameterize'),
+		limit = require('simple-rate-limiter'),
+		SVGO = require('svgo'),
+		moment = require('moment'),
+		jsonGenerator = require('./libs/json-generator'),
+		webfontGenerator = require('./libs/webfont-generator');
 
-	var _generator;
-	var documentId = null;
+	var _generator,
+		documentI = null;
 
-	var MENU_ID = "flatify";
-	var MENU_LABEL = "Flatify";
+	var MENU_ID = "flatify",
+		MENU_LABEL = "Flatify";
+
+	var startTime = null,
+		endTime = null;
 
 	function init(generator) {
 		_generator = generator;
@@ -39,98 +45,99 @@
 		documentId = document.id;
 	}
 
+	function handleGeneratorMenuClicked(event) {
+		setupFlatifiedDirs();
+
+		runPhotoshopJsx().then(function() {
+			_generator.alert("Starting phase 2. This  all happens behind the scenes, but I'll tell you when it's done!");
+			exportIconsFromDoc();
+		});
+	}
+
+
 	function setupFlatifiedDirs() {
+		console.log('Creating Dirs');
 		var homeDir = process.env.HOME;
+
+		startTime = new Date();
 
 		rimraf(homeDir + '/Desktop/flatified', function() {
 			mkdirp(homeDir + '/Desktop/flatified');
 			mkdirp(homeDir + '/Desktop/flatified/psd');
-			mkdirp(homeDir + '/Desktop/flatified/ai');
+			mkdirp(homeDir + '/Desktop/flatified/pdf');
 			mkdirp(homeDir + '/Desktop/flatified/svg');
 			mkdirp(homeDir + '/Desktop/flatified/png');
 			mkdirp(homeDir + '/Desktop/flatified/png/1x');
 			mkdirp(homeDir + '/Desktop/flatified/png/2x');
 			mkdirp(homeDir + '/Desktop/flatified/png/3x');
 			mkdirp(homeDir + '/Desktop/flatified/png/4x');
-			mkdirp(homeDir + '/Desktop/flatified/font');
+			// mkdirp(homeDir + '/Desktop/flatified/font');
 		});
 	}
 
-	var saveSvg = limit(function(documentId, layer) {
-		console.log("Saving svg:", layer.name);
-		_generator.getSVG(documentId, layer.id).then(
-			function(svg) {
-				fs.writeFile(process.env.HOME + '/Desktop/flatified/svg/' + layer.name + '.svg', svg);
-			}
-		);
-	}).to(5).per(1000);
-
-	var savePng = limit(function(documentId, layer) {
-		console.log("Saving png:", layer.name);
-
-		var opts = {forceSmartPSDPixelScaling: true};
-		_generator.getPixmap(documentId, layer.id, opts).then(
-			function(pixmap) {
-				_generator.savePixmap(
-					pixmap,
-					process.env.HOME + '/Desktop/flatified/png/1x/' + layer.name + '.png',
-					{ format: 'png', quality: 24, ppi: 72 }
-				);
-			}
-		);
-
-		var opts = {scaleX: 2, scaleY: 2, forceSmartPSDPixelScaling: true};
-		_generator.getPixmap(documentId, layer.id, opts).then(
-			function(pixmap) {
-				_generator.savePixmap(
-					pixmap,
-					process.env.HOME + '/Desktop/flatified/png/2x/' + layer.name + '.png',
-					{ format:'png', quality: 24, ppi: 72 }
-				);
-			}
-		);
-
-		var opts = {scaleX: 3, scaleY: 3, forceSmartPSDPixelScaling: true};
-		_generator.getPixmap(documentId, layer.id, opts).then(
-			function(pixmap) {
-				_generator.savePixmap(
-					pixmap,
-					process.env.HOME + '/Desktop/flatified/png/3x/' + layer.name + '.png',
-					{format:'png', quality: 24, ppi: 72}
-				);
-			}
-		);
-
-		var opts = {scaleX: 4, scaleY: 4, forceSmartPSDPixelScaling: true};
-		_generator.getPixmap(documentId, layer.id, opts).then(
-			function(pixmap) {
-				_generator.savePixmap(
-					pixmap,
-					process.env.HOME + '/Desktop/flatified/png/4x/' + layer.name + '.png',
-					{format:'png', quality: 24, ppi: 72}
-				);
-			}
-		);
-	}).to(2).per(5000);
-
-	function handleGeneratorMenuClicked(event) {
-
-		setupFlatifiedDirs();
-
-		_generator.getDocumentInfo(documentId).then(
+	function exportIconsFromDoc() {
+		return _generator.getDocumentInfo(documentId).then(
 			function(document) {
+				tasks = [];
+
 				document.layers.forEach(function(layer) {
 					layer.layers.forEach(function(shapeLayer) {
-						saveSvg(document.id, shapeLayer);
-						savePng(document.id, shapeLayer);
+						var deferred = Q.defer();
+						saveSvg(document.id, shapeLayer, deferred);
+						tasks.push(deferred.promise);
 					});
 				});
 
-				_generator.evaluateJSXFile(__dirname + '/libs/ps.jsx');
+				Q.allSettled(tasks).then(function(results) {
+					console.log('export icons task all settled');
+
+					jsonGenerator.exportJson();
+
+					endTime = new Date();
+
+					var ms = endTime - startTime,
+						iconCount = tasks.length;
+						duration = moment.duration(ms).humanize();
+
+					_generator.alert('Flatified ' + iconCount + ' icons in ' + duration + '!');
+					// generateFont();
+				});
 			}
 		);
 	}
 
-	exports.init = init;
+	function generateFont() {
+		_generator.getDocumentInfo(documentId).then(
+			function(document) {
+				webfontGenerator.generateFont('test');
+			});
+	}
 
+	function runPhotoshopJsx() {
+		return _generator.evaluateJSXFile(__dirname + '/libs/ps.jsx');
+	}
+
+	var saveSvg = limit(function(documentId, layer, deferred) {
+		console.log("Saving svg:", layer.name);
+
+		_generator.getSVG(documentId, layer.id).then(function(svg) {
+				// {
+				//     // optimized SVG data string
+				//     data: '<svg width="10" height="20">test</svg>'
+				//     // additional info such as width/height
+				//     info: {
+				//         width: '10',
+				//         height: '20'
+				//     }
+				// }
+				svgo = new SVGO();
+				svgo.optimize(svg, function(result) {
+					fs.writeFile(process.env.HOME + '/Desktop/flatified/svg/' + layer.name + '.svg', result.data);
+					deferred.resolve('saved ' + layer.name);
+				});
+			}
+		);
+	}).to(2).per(1000);
+
+	exports.init = init;
 }());

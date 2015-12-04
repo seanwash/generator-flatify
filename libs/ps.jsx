@@ -40,6 +40,12 @@
 		var psdFilePath = new File('~/Desktop/flatified/psd/' + iconLayer.name + '.psd');
 		iconDoc.saveAs(psdFilePath);
 
+		// then PDF
+		var pdfFilePath = new File('~/Desktop/flatified/pdf/' + iconLayer.name + '.pdf'),
+			pdfExportOpts = new PDFSaveOptions;
+
+		iconDoc.saveAs(pdfFilePath, pdfExportOpts);
+
 		// then AI
 		// var aiFilePath = new File('~/Desktop/flatified/ai/' + iconLayer.name + '.ai'),
 		// 	illustratorExportOpts = new ExportOptionsIllustrator;
@@ -49,17 +55,17 @@
 		// iconDoc.exportDocument(aiFilePath, ExportType.ILLUSTRATORPATHS, illustratorExportOpts);
 
 		// finally PNG
-		// for (var x = 1; x <= 4; x++) {
-		// 	var pngFilePath = new File('~/Desktop/flatified/png/' + x + 'x/' + iconLayer.name + '.png'),
-		// 		pngExportOpts = new ExportOptionsSaveForWeb();
+		for (var x = 1; x <= 4; x++) {
+			var pngFilePath = new File('~/Desktop/flatified/png/' + x + 'x/' + iconLayer.name + '.png'),
+				pngExportOpts = new ExportOptionsSaveForWeb();
 
-		// 	pngExportOpts.format = SaveDocumentType.PNG;
-		// 	pngExportOpts.PNG8 = false;
+			pngExportOpts.format = SaveDocumentType.PNG;
+			pngExportOpts.PNG8 = false;
 
-		// 	iconDoc.resizeImage(width * x, height * x); // scale image
-		// 	iconDoc.exportDocument(pngFilePath, ExportType.SAVEFORWEB, pngExportOpts); // export png
-		// 	iconDoc.resizeImage(width, height); // resize back to native
-		// }
+			iconDoc.resizeImage(width * x, height * x); // scale image
+			iconDoc.exportDocument(pngFilePath, ExportType.SAVEFORWEB, pngExportOpts); // export png
+			iconDoc.resizeImage(width, height); // resize back to native
+		}
 
 		// close our temp doc, and switch back to the document with all the icons
 		iconDoc.close(SaveOptions.DONOTSAVECHANGES);
@@ -77,4 +83,3 @@
 		}
 	}
 })();
-
