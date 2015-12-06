@@ -9,7 +9,9 @@
 		SVGO = require('svgo'),
 		moment = require('moment'),
 		jsonGenerator = require('./libs/json-generator'),
-		webfontGenerator = require('./libs/webfont-generator');
+		webfontGenerator = require('./libs/webfont-generator'),
+		gulp = require('gulp'),
+		iconfont = require('gulp-iconfont');
 
 	var _generator,
 		documentI = null;
@@ -71,7 +73,7 @@
 			mkdirp(homeDir + '/Desktop/flatified/png/2x');
 			mkdirp(homeDir + '/Desktop/flatified/png/3x');
 			mkdirp(homeDir + '/Desktop/flatified/png/4x');
-			// mkdirp(homeDir + '/Desktop/flatified/font');
+			mkdirp(homeDir + '/Desktop/flatified/font');
 		});
 	}
 
@@ -100,17 +102,28 @@
 						duration = moment.duration(ms).humanize();
 
 					_generator.alert('Flatified ' + iconCount + ' icons in ' + duration + '!');
-					// generateFont();
+					generateFont();
 				});
 			}
 		);
 	}
 
 	function generateFont() {
-		_generator.getDocumentInfo(documentId).then(
-			function(document) {
-				webfontGenerator.generateFont('test');
-			});
+		console.log('Generating Font');
+		var homeDir = process.env.HOME;
+
+		gulp.task('default', function() {
+			return gulp.src([homeDir + '/Desktop/flatified/svg/*.svg'])
+				.pipe(iconfont({
+					fontName: 'myfont',
+					formats: ['ttf', 'eot', 'woff', 'svg'],
+					fixedWidth: true,
+					normalize: true
+				}))
+				.pipe(gulp.dest(homeDir + '/Desktop/flatified/font/'));
+		});
+
+		gulp.run();
 	}
 
 	function runPhotoshopJsx() {
