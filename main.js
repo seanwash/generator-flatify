@@ -9,12 +9,12 @@
 		SVGO = require('svgo'),
 		moment = require('moment'),
 		jsonGenerator = require('./libs/json-generator'),
-		webfontGenerator = require('./libs/webfont-generator'),
 		gulp = require('gulp'),
 		iconfont = require('gulp-iconfont');
 
 	var _generator,
-		documentI = null;
+		documentId = null,
+		documentName = null;
 
 	var MENU_ID = "flatify",
 		MENU_LABEL = "Flatify";
@@ -47,7 +47,21 @@
 		documentId = document.id;
 	}
 
+	function getDocumentName() {
+		_generator.getDocumentInfo().then(function(res) {
+			documentId = res.id;
+
+			path = res.file.split('/');
+			name = path[path.length - 1];
+			name = name.substr(0, name.lastIndexOf('.')) || name;
+			console.log('Document Name', name);
+
+			documentName = name;
+		});
+	}
+
 	function handleGeneratorMenuClicked(event) {
+		getDocumentName();
 		setupFlatifiedDirs();
 
 		runPhotoshopJsx().then(function() {
@@ -115,7 +129,7 @@
 		gulp.task('default', function() {
 			return gulp.src([homeDir + '/Desktop/flatified/svg/*.svg'])
 				.pipe(iconfont({
-					fontName: 'myfont',
+					fontName: documentName,
 					formats: ['ttf', 'eot', 'woff', 'svg'],
 					fixedWidth: true,
 					normalize: true
