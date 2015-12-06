@@ -107,7 +107,7 @@
 				Q.allSettled(tasks).then(function(results) {
 					console.log('export icons task all settled');
 
-					jsonGenerator.exportJson();
+					jsonGenerator.exportJson(documentName);
 
 					endTime = new Date();
 

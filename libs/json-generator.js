@@ -11,7 +11,7 @@ var fs = require('fs'),
 	async = require('async'),
 	child_process = require('child_process');
 
-exports.exportJson = function() {
+exports.exportJson = function(setName) {
 	var svgsFolder = process.env.HOME + '/Desktop/flatified/svg',
 		finalJson = [];
 
@@ -29,7 +29,7 @@ exports.exportJson = function() {
 
 			finalJson.push({
 				"name": dasherizedFileName,
-				"tags": dasherizedFileName
+				"tags": setName + ' ' + dasherizedFileName
 			});
 
 			cb();
