@@ -9,6 +9,8 @@
   "devDependencies": {
     "async": "^1.5.0",
     "fs": "0.0.2",
+    "gulp-consolidate": "^0.1.2",
+    "gulp-iconfont": "^5.0.1",
     "mkdirp": "^0.5.1",
     "moment": "^2.10.6",
     "parameterize": "0.0.7",
@@ -16,7 +18,9 @@
     "rimraf": "^2.4.3",
     "simple-rate-limiter": "^0.2.3",
     "svgo": "^0.6.1",
-    "tmp": "0.0.28",
-    "webfonts-generator": "^0.3.1"
+    "tmp": "0.0.28"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1"
   }
 }

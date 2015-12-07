@@ -8,9 +8,8 @@
 		limit = require('simple-rate-limiter'),
 		SVGO = require('svgo'),
 		moment = require('moment'),
-		jsonGenerator = require('./libs/json-generator'),
-		gulp = require('gulp'),
-		iconfont = require('gulp-iconfont');
+		webfontsGenerator = require('./libs/webfont-generator'),
+		jsonGenerator = require('./libs/json-generator');
 
 	var _generator,
 		documentId = null,
@@ -64,12 +63,13 @@
 		getDocumentName();
 		setupFlatifiedDirs();
 
-		runPhotoshopJsx().then(function() {
-			_generator.alert("Starting phase 2. This  all happens behind the scenes, but I'll tell you when it's done!");
-			exportIconsFromDoc();
-		});
-	}
+		exportIconsFromDoc();
 
+		// runPhotoshopJsx().then(function() {
+		// 	_generator.alert("Starting phase 2. This  all happens behind the scenes, but I'll tell you when it's done!");
+		// 	exportIconsFromDoc();
+		// });
+	}
 
 	function setupFlatifiedDirs() {
 		console.log('Creating Dirs');
@@ -107,6 +107,7 @@
 				Q.allSettled(tasks).then(function(results) {
 					console.log('export icons task all settled');
 
+					webfontsGenerator.generateFont(documentName);
 					jsonGenerator.exportJson(documentName);
 
 					endTime = new Date();
@@ -116,28 +117,9 @@
 						duration = moment.duration(ms).humanize();
 
 					_generator.alert('Flatified ' + iconCount + ' icons in ' + duration + '!');
-					generateFont();
 				});
 			}
 		);
-	}
-
-	function generateFont() {
-		console.log('Generating Font');
-		var homeDir = process.env.HOME;
-
-		gulp.task('default', function() {
-			return gulp.src([homeDir + '/Desktop/flatified/svg/*.svg'])
-				.pipe(iconfont({
-					fontName: documentName,
-					formats: ['ttf', 'eot', 'woff', 'svg'],
-					fixedWidth: true,
-					normalize: true
-				}))
-				.pipe(gulp.dest(homeDir + '/Desktop/flatified/font/'));
-		});
-
-		gulp.run();
 	}
 
 	function runPhotoshopJsx() {
@@ -145,25 +127,10 @@
 	}
 
 	var saveSvg = limit(function(documentId, layer, deferred) {
-		console.log("Saving svg:", layer.name);
-
 		_generator.getSVG(documentId, layer.id).then(function(svg) {
-				// {
-				//     // optimized SVG data string
-				//     data: '<svg width="10" height="20">test</svg>'
-				//     // additional info such as width/height
-				//     info: {
-				//         width: '10',
-				//         height: '20'
-				//     }
-				// }
-				svgo = new SVGO();
-				svgo.optimize(svg, function(result) {
-					fs.writeFile(process.env.HOME + '/Desktop/flatified/svg/' + layer.name + '.svg', result.data);
-					deferred.resolve('saved ' + layer.name);
-				});
-			}
-		);
+			fs.writeFile(process.env.HOME + '/Desktop/flatified/svg/' + layer.name + '.svg', svg);
+			deferred.resolve('saved ' + layer.name);
+		});
 	}).to(2).per(1000);
 
 	exports.init = init;

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title><%= fontName %> - Flaticons</title>
+
+		<link rel="stylesheet" href="<%= cssPath %>">
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+		<style>
+			body {
+				background: #dbe2e9;
+				font-family: 'Roboto', sans-serif;
+			}
+
+			pre {
+				margin-bottom: 0;
+			}
+
+			.icon-list {
+				margin: 0;
+				padding: 0;
+			}
+
+			.row {
+				border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+				color: rgba(30, 60, 76, 0.7);
+				list-style: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 1rem;
+			}
+
+			.reference {
+				flex: 1;
+			}
+
+			.<%= className %> {
+				flex: 1;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<ul class="icon-list">
+			<% _.each(glyphs, function(glyph) { %>
+				<li class="row <%= glyph.name.replace(/ /g,'-').toLowerCase() %>">
+					<span class="reference">.<%= glyph.name.replace(/ /g,'-').toLowerCase() %> <pre>\<%= glyph.unicode[0].charCodeAt(0).toString(16).toUpperCase() %></pre></span>
+
+					<i class="<%= className %> size-16 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-18 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-21 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-24 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-36 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-48 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-60 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+					<i class="<%= className %> size-72 <%= className %>-<%= glyph.name.replace(/ /g,'-').toLowerCase() %>"></i>
+				</li>
+			<% }); %>
+		</li>
+	</body>
+</html>
