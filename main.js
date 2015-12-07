@@ -63,12 +63,12 @@
 		getDocumentName();
 		setupFlatifiedDirs();
 
-		exportIconsFromDoc();
+		// exportIconsFromDoc();
 
-		// runPhotoshopJsx().then(function() {
-		// 	_generator.alert("Starting phase 2. This  all happens behind the scenes, but I'll tell you when it's done!");
-		// 	exportIconsFromDoc();
-		// });
+		runPhotoshopJsx().then(function() {
+			_generator.alert("Starting phase 2. This  all happens behind the scenes, but I'll tell you when it's done!");
+			exportIconsFromDoc();
+		});
 	}
 
 	function setupFlatifiedDirs() {
