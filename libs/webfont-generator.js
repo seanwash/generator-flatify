@@ -1,9 +1,10 @@
-var homeDir = process.env.HOME,
-	gulp = require('gulp'),
-	iconfont = require('gulp-iconfont'),
-	cons = require('gulp-consolidate');
+var gulp = require('gulp'),
+	cons = require('gulp-consolidate'),
+	iconfont = require('gulp-iconfont');
 
 exports.generateFont = function(setName) {
+	var homeDir = process.env.HOME;
+
 	gulp.task('default', function() {
 		return gulp.src([homeDir + '/Desktop/flatified/svg/*.svg'])
 			.pipe(iconfont({

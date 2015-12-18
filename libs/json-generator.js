@@ -18,6 +18,8 @@ exports.exportJson = function(setName) {
 	fs.readdir(svgsFolder, function(err, files) {
 		if (err) throw err;
 
+		console.log('asdfaasdasfds');
+
 		async.eachSeries(files, function(fileNameWithExt, cb) {
 			if (!(/\.svg$/).test(fileNameWithExt)) {
 				// we only care about SVG files

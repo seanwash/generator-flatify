@@ -6,21 +6,18 @@
   "author": "Sean Washington <hello@seanwash.com> (http://seanwash.com)",
   "license": "ISC",
   "generator-core-version": "^3.4.0",
-  "devDependencies": {
+  "dependencies": {
     "async": "^1.5.0",
     "fs": "0.0.2",
+    "gulp": "^3.9.0",
     "gulp-consolidate": "^0.1.2",
     "gulp-iconfont": "^5.0.1",
+    "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
     "moment": "^2.10.6",
-    "parameterize": "0.0.7",
     "q": "^1.4.1",
     "rimraf": "^2.4.3",
     "simple-rate-limiter": "^0.2.3",
-    "svgo": "^0.6.1",
     "tmp": "0.0.28"
-  },
-  "dependencies": {
-    "lodash": "^3.10.1"
   }
 }

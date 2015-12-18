@@ -1,22 +1,19 @@
 (function () {
-
 	var fs = require('fs'),
 		Q = require('q'),
 		rimraf = require('rimraf'),
 		mkdirp = require('mkdirp'),
-		parameterize = require('parameterize'),
 		limit = require('simple-rate-limiter'),
-		SVGO = require('svgo'),
 		moment = require('moment'),
-		webfontsGenerator = require('./libs/webfont-generator'),
-		jsonGenerator = require('./libs/json-generator');
+		jsonGenerator = require('./libs/json-generator'),
+		webfontsGenerator = require('./libs/webfont-generator');
 
 	var _generator,
 		documentId = null,
 		documentName = null;
 
 	var MENU_ID = "flatify",
-		MENU_LABEL = "Flatify";
+		MENU_LABEL = "Flatify 0.7";
 
 	var startTime = null,
 		endTime = null;
@@ -26,10 +23,10 @@
 
 		_generator.addMenuItem(MENU_ID, MENU_LABEL, true, false).then(
 			function() {
-				console.log("Menu created");
+				console.log("Flatifier / Menu created");
 			},
 			function() {
-				console.log("Menu creation failed");
+				console.log("Flatifier / Menu creation failed");
 			}
 		);
 
@@ -50,8 +47,9 @@
 		_generator.getDocumentInfo().then(function(res) {
 			documentId = res.id;
 
-			path = res.file.split('/');
-			name = path[path.length - 1];
+			var path = res.file.split('/'),
+				name = path[path.length - 1];
+
 			name = name.substr(0, name.lastIndexOf('.')) || name;
 			console.log('Document Name', name);
 
@@ -62,8 +60,6 @@
 	function handleGeneratorMenuClicked(event) {
 		getDocumentName();
 		setupFlatifiedDirs();
-
-		// exportIconsFromDoc();
 
 		runPhotoshopJsx().then(function() {
 			_generator.alert("Starting phase 2. This  all happens behind the scenes, but I'll tell you when it's done!");
@@ -94,7 +90,7 @@
 	function exportIconsFromDoc() {
 		return _generator.getDocumentInfo(documentId).then(
 			function(document) {
-				tasks = [];
+				var tasks = [];
 
 				document.layers.forEach(function(layer) {
 					layer.layers.forEach(function(shapeLayer) {
@@ -113,7 +109,7 @@
 					endTime = new Date();
 
 					var ms = endTime - startTime,
-						iconCount = tasks.length;
+						iconCount = tasks.length,
 						duration = moment.duration(ms).humanize();
 
 					_generator.alert('Flatified ' + iconCount + ' icons in ' + duration + '!');
