@@ -34,15 +34,27 @@
 		// move dupIconLayer to 0x0
 		dupIconLayer.translate(- bounds[0].value, - bounds[1].value);
 
+		//
 		// do all the exporting magic
+		//
+
+		var iconName = iconLayer.name;
+
+		// Parameterize - since I don't have access to regular node modules here
+		// I'm duplicating some logic from the npm module parameterize to make
+		// sure that filenames are consistent
+		iconName = iconName.replace(/[^-\w\s]/g, '');  // remove unneeded chars
+		iconName = iconName.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
+		iconName = iconName.replace(/[-\s]+/g, '-');   // convert spaces to hyphens
+		iconName = iconName.toLowerCase();             // convert to lowercase
 
 		// first PSD
-		var psdFilePath = new File('~/Desktop/flatified/psd/' + iconLayer.name + '.psd');
+		var psdFilePath = new File('~/Desktop/flatified/psd/' + iconName + '.psd');
 		iconDoc.saveAs(psdFilePath);
 
 		// then PDF
-		var pdfFilePath = new File('~/Desktop/flatified/pdf/' + iconLayer.name + '.pdf'),
-			pdfExportOpts = new PDFSaveOptions;
+		var pdfFilePath = new File('~/Desktop/flatified/pdf/' + iconName + '.pdf'),
+			pdfExportOpts = new PDFSaveOptions();
 
 		iconDoc.saveAs(pdfFilePath, pdfExportOpts);
 
@@ -56,7 +68,7 @@
 
 		// finally PNG
 		for (var x = 1; x <= 4; x++) {
-			var pngFilePath = new File('~/Desktop/flatified/png/' + x + 'x/' + iconLayer.name + '.png'),
+			var pngFilePath = new File('~/Desktop/flatified/png/' + x + 'x/' + iconName + '.png'),
 				pngExportOpts = new ExportOptionsSaveForWeb();
 
 			pngExportOpts.format = SaveDocumentType.PNG;

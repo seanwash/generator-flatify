@@ -7,3 +7,41 @@ To get started, clone this repo and run `npm i`. Also, you'll probably want to f
 **Note**
 
 Pay special attention to the [node version](https://github.com/adobe-photoshop/generator-core/wiki/Node-versions) that's currently shipping with Photoshop. This bit me while testing locally with 4.2.x and PS running 0.10.x. Make sure to `npm i` while using the same Node version as ships with Photoshop.
+
+## Exported Assets Structure
+
+```
+/flatified
+-- font
+	-- preview
+		-- preview.css
+		-- preview.html
+	-- flaticons-solid-2.{svg, eot, ttf, woff}
+-- icons.json
+-- pdf
+	-- icon-name-1.pdf
+-- png
+	-- 1x
+		-- icon-name-1.png
+	-- 2x
+		-- icon-name-1.png
+	-- 3x
+		-- icon-name-1.png
+	-- 4x
+		-- icon-name-1.png
+-- psd
+	-- icon-name-1.psd
+-- svg
+	-- icon-name-1.svg
+```
+
+## Exported JSON Structure
+
+```
+[
+	{
+		"name": "grid-1",
+		"tags": "grid-1 grid"
+	}
+]
+```

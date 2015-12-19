@@ -4,6 +4,7 @@
 		rimraf = require('rimraf'),
 		mkdirp = require('mkdirp'),
 		limit = require('simple-rate-limiter'),
+		parameterize = require('parameterize'),
 		moment = require('moment'),
 		jsonGenerator = require('./libs/json-generator'),
 		webfontsGenerator = require('./libs/webfont-generator');
@@ -13,7 +14,7 @@
 		documentName = null;
 
 	var MENU_ID = "flatify",
-		MENU_LABEL = "Flatify 0.7";
+		MENU_LABEL = "Flatify 0.8";
 
 	var startTime = null,
 		endTime = null;
@@ -51,9 +52,9 @@
 				name = path[path.length - 1];
 
 			name = name.substr(0, name.lastIndexOf('.')) || name;
-			console.log('Document Name', name);
+			console.log('Document Name', parameterize(name));
 
-			documentName = name;
+			documentName = parameterize(name);
 		});
 	}
 
@@ -119,13 +120,15 @@
 	}
 
 	function runPhotoshopJsx() {
-		return _generator.evaluateJSXFile(__dirname + '/libs/ps.jsx');
+		return _generator.evaluateJSXFile(__dirname + '/libs/ps-generator.jsx');
 	}
 
 	var saveSvg = limit(function(documentId, layer, deferred) {
 		_generator.getSVG(documentId, layer.id).then(function(svg) {
-			fs.writeFile(process.env.HOME + '/Desktop/flatified/svg/' + layer.name + '.svg', svg);
-			deferred.resolve('saved ' + layer.name);
+			var name = parameterize(layer.name);
+
+			fs.writeFile(process.env.HOME + '/Desktop/flatified/svg/' + name + '.svg', svg);
+			deferred.resolve('saved ' + name);
 		});
 	}).to(2).per(1000);
 

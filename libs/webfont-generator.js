@@ -3,12 +3,13 @@ var gulp = require('gulp'),
 	iconfont = require('gulp-iconfont');
 
 exports.generateFont = function(setName) {
-	var homeDir = process.env.HOME;
+	var homeDir = process.env.HOME,
+		fontName = 'flaticons-' + setName;
 
 	gulp.task('default', function() {
 		return gulp.src([homeDir + '/Desktop/flatified/svg/*.svg'])
 			.pipe(iconfont({
-				fontName: setName,
+				fontName: fontName,
 				formats: ['ttf', 'eot', 'woff', 'svg'],
 				normalize: true,
 				centerHorizontally: true,
@@ -20,7 +21,7 @@ exports.generateFont = function(setName) {
 				gulp.src(__dirname + '/preview.css')
 				.pipe(cons('lodash', {
 					glyphs: glyphs,
-					fontName: setName,
+					fontName:  fontName,
 					fontPath: '../',
 					className: 'flaticon'
 				}))
@@ -29,7 +30,7 @@ exports.generateFont = function(setName) {
 				gulp.src(__dirname + '/preview.html')
 				.pipe(cons('lodash', {
 					glyphs: glyphs,
-					fontName: setName,
+					fontName: fontName,
 					cssPath: 'preview.css',
 					className: 'flaticon'
 				}))
